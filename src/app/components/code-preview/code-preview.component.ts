@@ -1,66 +1,28 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 import { LayoutService } from '../../services/layout.service';
 
 @Component({
   selector: 'app-code-preview',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MatIconModule, MatButtonModule],
   template: `
-    <div class="code-preview-container">
+    <div class="bg-white rounded p-4 text-dark shadow-sm">
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="mb-0">
-          <i class="fas fa-code me-2"></i>HTML Generado
+        <h5 class="mb-0 d-flex align-items-center">
+          <mat-icon class="me-2 text-primary">html</mat-icon> HTML Generado
         </h5>
-        <button class="btn-copy" (click)="copyCode()">
-          <i class="fas fa-copy me-2"></i>Copiar
+        <button mat-flat-button color="primary" (click)="copyCode()">
+          <mat-icon class="me-2">content_copy</mat-icon> Copiar
         </button>
       </div>
-      <div class="code-preview">
-        <pre><code>{{ layoutService.generatedCode() }}</code></pre>
+      <div class="bg-dark rounded p-4 text-light overflow-auto" style="max-height: 400px;">
+        <pre class="m-0" style="font-size: 13px;"><code class="text-light" style="font-family: 'Consolas', 'Monaco', monospace; white-space: pre;">{{ layoutService.generatedCode() }}</code></pre>
       </div>
     </div>
-  `,
-  styles: [`
-    .code-preview-container {
-      background: #fff;
-      border-radius: 8px;
-      padding: 20px;
-      color: #333;
-    }
-    
-    .btn-copy {
-      background: #0d6efd;
-      border: none;
-      color: white;
-      padding: 8px 16px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    
-    .btn-copy:hover {
-      background: #0b5ed7;
-    }
-    
-    .code-preview {
-      background: #0d1117;
-      border-radius: 8px;
-      padding: 20px;
-      max-height: 400px;
-      overflow: auto;
-    }
-    
-    .code-preview pre {
-      margin: 0;
-      font-size: 13px;
-    }
-    
-    .code-preview code {
-      color: #c9d1d9;
-      font-family: 'Consolas', 'Monaco', monospace;
-      white-space: pre;
-    }
-  `]
+  `
 })
 export class CodePreviewComponent {
   readonly layoutService = inject(LayoutService);

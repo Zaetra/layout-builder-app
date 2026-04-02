@@ -1,154 +1,79 @@
-import { Component, inject, Output, EventEmitter } from '@angular/core';
+import { Component, inject, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 import { LayoutService } from '../../services/layout.service';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, MatIconModule],
+  imports: [CommonModule, MatIconModule, MatButtonModule],
   template: `
-    <div class="sidebar h-100 d-flex flex-column">
+    <div class="h-100 d-flex flex-column text-light p-4 overflow-auto border-end border-secondary" style="width: 300px; background-color: #16213e;">
       <div class="d-flex justify-content-between align-items-center mb-4 d-md-none">
-        <h5 class="mb-0">
-          <i class="fas fa-th-large me-2"></i>Layout Builder
+        <h5 class="mb-0 d-flex align-items-center">
+          <mat-icon class="me-2 text-primary">dashboard</mat-icon> Layout Builder
         </h5>
-        <button class="btn btn-link text-white p-0" (click)="closeSidebar.emit()">
+        <button mat-icon-button class="text-white" (click)="closeSidebar.emit()">
           <mat-icon>close</mat-icon>
         </button>
       </div>
       
       <div class="d-none d-md-block">
-        <h4 class="mb-4">
-          <i class="fas fa-th-large me-2"></i>Layout Builder
+        <h4 class="mb-4 d-flex align-items-center">
+          <mat-icon class="me-2 text-primary">dashboard</mat-icon> Layout Builder
         </h4>
       </div>
       
-      <h6 class="text-muted mb-3">Preset de Filas</h6>
-      <div class="presets-container flex-grow-1">
+      <h6 class="text-secondary mb-3 text-uppercase small fw-bold">Preset de Filas</h6>
+      <div class="flex-grow-1 overflow-auto" style="max-height: 400px;">
         @for (preset of layoutService.presets; track preset.name; let i = $index) {
-          <div class="preset-card" (click)="applyPreset(preset)">
-            <div class="preset-content">
-              <span>{{ preset.name }}</span>
-              <button class="btn btn-sm btn-primary" (click)="applyPreset(preset); $event.stopPropagation()">
-                <i class="fas fa-plus"></i>
-              </button>
-            </div>
-            <div class="preset-grid">
-              @for (size of preset.cols; track $index) {
-                <div class="preset-cell" [style.grid-column]="'span ' + size"></div>
-              }
+          <div class="card bg-secondary bg-opacity-25 border-secondary mb-3" style="cursor: pointer;" (click)="applyPreset(preset)">
+            <div class="card-body p-3">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-light fw-medium">{{ preset.name }}</span>
+                <button mat-icon-button color="primary" class="align-self-center" style="transform: scale(0.8);" (click)="applyPreset(preset); $event.stopPropagation()">
+                  <mat-icon>add</mat-icon>
+                </button>
+              </div>
+              <div class="d-grid gap-1" style="grid-template-columns: repeat(12, 1fr);">
+                @for (size of preset.cols; track $index) {
+                  <div class="bg-primary rounded-1" [style.grid-column]="'span ' + size" style="height: 8px;"></div>
+                }
+              </div>
             </div>
           </div>
         }
       </div>
       
-      <hr class="my-4" style="border-color: #2d4a7c;">
+      <hr class="my-4 border-secondary border-opacity-50">
       
-      <h6 class="text-muted mb-3">Agregar Columna</h6>
-      <div class="d-flex flex-wrap mb-3">
+      <h6 class="text-secondary mb-3 text-uppercase small fw-bold">Agregar Columna</h6>
+      <div class="d-flex flex-wrap gap-2 mb-3">
         @for (size of columnSizes; track size) {
-          <button class="btn btn-primary btn-sm btn-column" (click)="addColumnToLast(size)">
+          <button mat-stroked-button color="primary" class="flex-grow-1" (click)="addColumnToLast(size)">
             {{ size }}
           </button>
         }
       </div>
       
-      <hr class="my-4" style="border-color: #2d4a7c;">
+      <hr class="my-4 border-secondary border-opacity-50">
       
-      <h6 class="text-muted mb-3">Herramientas</h6>
-      <button class="btn btn-add-row w-100 mb-2" (click)="addNewRow()">
-        <i class="fas fa-plus me-2"></i>Nueva Fila
+      <h6 class="text-secondary mb-3 text-uppercase small fw-bold">Herramientas</h6>
+      <button mat-flat-button color="accent" class="w-100 mb-3 py-4 d-flex justify-content-center" (click)="addNewRow()">
+        <mat-icon class="me-2">add_to_queue</mat-icon> Nueva Fila
       </button>
-      <button class="btn btn-clear w-100 mb-2" (click)="clearAll()">
-        <i class="fas fa-trash me-2"></i>Limpiar Todo
+      <button mat-flat-button color="warn" class="w-100 py-4 d-flex justify-content-center" (click)="clearAll()">
+        <mat-icon class="me-2">delete_sweep</mat-icon> Limpiar Todo
       </button>
     </div>
-  `,
-  styles: [`
-    .sidebar {
-      background: #16213e;
-      padding: 20px;
-      overflow-y: auto;
-      width: 300px;
-    }
-    
-    .presets-container {
-      max-height: 300px;
-      overflow-y: auto;
-    }
-    
-    .preset-card {
-      background: #1f3460;
-      border: 1px solid #2d4a7c;
-      border-radius: 6px;
-      padding: 10px;
-      margin-bottom: 10px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    
-    .preset-card:hover {
-      background: #2d4a7c;
-      border-color: #3d5a8c;
-    }
-    
-    .preset-content {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-    
-    .preset-grid {
-      display: grid;
-      grid-template-columns: repeat(12, 1fr);
-      gap: 2px;
-    }
-    
-    .preset-cell {
-      background: #0d6efd;
-      height: 8px;
-      border-radius: 2px;
-    }
-    
-    .btn-column {
-      margin: 3px;
-      min-width: 40px;
-    }
-    
-    .btn-add-row {
-      background: #198754;
-      border: none;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    
-    .btn-add-row:hover {
-      background: #157347;
-    }
-    
-    .btn-clear {
-      background: #dc3545;
-      border: none;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    
-    .btn-clear:hover {
-      background: #c82333;
-    }
-  `]
+  `
 })
 export class SidebarComponent {
   readonly layoutService = inject(LayoutService);
   readonly columnSizes = [1, 2, 3, 4, 6, 12];
   
-  @Output() closeSidebar = new EventEmitter<void>();
+  readonly closeSidebar = output<void>();
 
   applyPreset(preset: { name: string; cols: number[] }): void {
     this.layoutService.addRowWithPreset(preset);

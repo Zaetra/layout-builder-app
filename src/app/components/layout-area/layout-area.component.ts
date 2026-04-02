@@ -2,6 +2,11 @@ import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DragDropModule, CdkDragDrop } from '@angular/cdk/drag-drop';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatInputModule } from '@angular/material/input';
 import { LayoutService } from '../../services/layout.service';
 import { Column, Row } from '../../interfaces/row.interface';
 
@@ -14,34 +19,43 @@ interface SelectedElement {
 @Component({
   selector: 'app-layout-area',
   standalone: true,
-  imports: [CommonModule, FormsModule, DragDropModule],
+  imports: [
+    CommonModule, 
+    FormsModule, 
+    DragDropModule,
+    MatIconModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatInputModule
+  ],
   template: `
-    <div class="layout-area min-vh-100" (click)="deselect()">
+    <div class="h-100 bg-white rounded p-4 text-dark overflow-hidden mb-5 pb-5" (click)="deselect()">
       @if (layoutService.rows().length === 0) {
-        <div class="empty-state">
-          <i class="fas fa-mouse-pointer fa-2x mb-3"></i>
-          <p>Agrega filas y columnas para comenzar tu layout</p>
-          <small>Usa los presets de la izquierda o crea personalizado</small>
+        <div class="text-center text-muted py-5 px-3">
+          <mat-icon style="font-size: 48px; width: 48px; height: 48px; opacity: 0.5;" class="mb-3">ads_click</mat-icon>
+          <p class="fs-5">Agrega filas y columnas para comenzar tu layout</p>
+          <small>Usa los presets de la izquierda o uno personalizado</small>
         </div>
       } @else {
         <div 
           cdkDropList 
           [cdkDropListData]="layoutService.rows()" 
           (cdkDropListDropped)="onRowDropped($event)"
-          class="rows-list">
+          class="w-100">
           
           @for (row of layoutService.rows(); track row.id) {
-            <div class="row-container" cdkDrag>
+            <div class="bg-warning bg-opacity-10 border border-warning rounded p-4 pt-4 pb-3 mb-4 position-relative" style="border-style: dashed !important; border-width: 2px !important;" cdkDrag>
               
-              <div class="row-label" (click)="selectRow(row.id); $event.stopPropagation()">
-                <i class="fas fa-grip-vertical me-1 drag-handle" cdkDragHandle></i> 
+              <div class="position-absolute top-0 start-0 translate-middle-y ms-3 badge bg-warning text-dark d-flex align-items-center shadow-sm z-3" style="cursor: pointer; font-size: 13px;" (click)="selectRow(row.id); $event.stopPropagation()">
+                <mat-icon class="me-1" style="font-size: 16px; width: 16px; height: 16px; cursor: grab;" cdkDragHandle>drag_indicator</mat-icon> 
                 Fila {{ $index + 1 }}
-                <button class="btn-delete-sm ms-2" (click)="removeRow(row.id); $event.stopPropagation()">
-                  <i class="fas fa-times"></i>
+                <button mat-icon-button class="ms-1" style="width: 24px; height: 24px; line-height: 24px; padding: 0;" (click)="removeRow(row.id); $event.stopPropagation()">
+                  <mat-icon style="font-size: 16px;">close</mat-icon>
                 </button>
               </div>
               
-              <div class="row custom-row flex-wrap"
+              <div class="row flex-wrap align-items-stretch"
                    [class]="getRowClasses(row)"
                    [style.min-height]="row.customHeight"
                    cdkDropList
@@ -52,23 +66,24 @@ interface SelectedElement {
                    (cdkDropListDropped)="onColumnDropped($event, row.id)">
                 
                 @for (col of row.columns; track col.id) {
-                  <div [class]="getColClasses(col)" cdkDrag>
-                    <div class="column" 
-                         [class.selected]="isSelectedColumn(row.id, col.id)"
+                  <div [class]="getColClasses(col)" class="mb-3" cdkDrag>
+                    <div class="h-100 rounded p-3 position-relative border border-primary border-opacity-75 transition-all" 
+                         [ngClass]="isSelectedColumn(row.id, col.id) ? 'bg-success bg-opacity-10 border-success shadow-sm' : 'bg-primary bg-opacity-10'"
+                         style="border-style: dashed !important; border-width: 2px !important; cursor: pointer; min-height: 100px;"
                          [style.min-height]="col.customHeight"
                          (click)="selectColumn(row.id, col.id); $event.stopPropagation()">
                          
-                      <div class="column-header">
-                        <div class="d-flex align-items-center gap-2">
-                          <i class="fas fa-grip-vertical drag-handle" cdkDragHandle></i>
+                      <div class="bg-primary text-white position-absolute top-0 start-0 end-0 d-flex justify-content-between align-items-center px-2 py-1 shadow-sm" style="border-radius: 2px 2px 0 0; font-size: 12px; margin-top: -2px; margin-left: -2px; margin-right: -2px;" [ngClass]="isSelectedColumn(row.id, col.id) ? 'bg-success' : 'bg-primary'">
+                        <div class="d-flex align-items-center gap-1">
+                          <mat-icon style="font-size: 14px; width: 14px; height: 14px; cursor: grab;" cdkDragHandle>drag_indicator</mat-icon>
                           <span>Col (md-{{ col.sizes.md || 'auto' }})</span>
                         </div>
-                        <button class="btn-delete" (click)="removeColumn(row.id, col.id); $event.stopPropagation()">
-                          <i class="fas fa-times"></i>
+                        <button mat-icon-button class="text-white" style="width: 20px; height: 20px; line-height: 20px; padding: 0;" (click)="removeColumn(row.id, col.id); $event.stopPropagation()">
+                          <mat-icon style="font-size: 14px;">close</mat-icon>
                         </button>
                       </div>
                       
-                      <div class="column-content">
+                      <div class="h-100 mt-4 bg-dark bg-opacity-10 rounded d-flex align-items-center justify-content-center text-muted" style="min-height: 40px;">
                         Contenido
                       </div>
                     </div>
@@ -76,12 +91,9 @@ interface SelectedElement {
                 }
                 
                 <div class="col-12 mt-2" cdkDrag [cdkDragDisabled]="true">
-                  <div class="d-flex flex-wrap gap-1">
+                  <div class="d-flex flex-wrap gap-2">
                     @for (size of availableSizes; track size) {
-                      <button 
-                        class="btn btn-outline-primary btn-sm" 
-                        (click)="addColumn(row.id, size); $event.stopPropagation()"
-                        title="Agregar col-{{ size }}">
+                      <button mat-stroked-button color="primary" class="rounded-pill" (click)="addColumn(row.id, size); $event.stopPropagation()" title="Agregar col-{{ size }}">
                         +{{ size }}
                       </button>
                     }
@@ -95,402 +107,161 @@ interface SelectedElement {
     </div>
 
     @if (selectedElement()) {
-      <div class="properties-drawer" [class.open]="selectedElement()" (click)="$event.stopPropagation()">
-        <div class="properties-header d-flex justify-content-between align-items-center">
+      <div class="position-sticky bottom-0 w-100 bg-dark text-white shadow-lg border-top border-primary border-3 rounded-top mt-5" (click)="$event.stopPropagation()" style="z-index: 1050;">
+        
+        <div class="d-flex justify-content-between align-items-center bg-secondary bg-opacity-25 py-2 px-4 shadow-sm">
           <div class="d-flex align-items-center">
-            <i class="fas fa-sliders-h me-2"></i>
-            <span class="fw-bold">Propiedades</span>
-            <span class="badge bg-primary ms-2">
+            <mat-icon class="me-2 text-primary">tune</mat-icon>
+            <span class="fw-bold fs-5">Propiedades</span>
+            <span class="badge bg-primary ms-3 fs-6">
               {{ selectedElement()?.type === 'row' ? 'Fila' : 'Columna' }}
             </span>
           </div>
-          <button class="btn-close-drawer" (click)="deselect()">
-            <i class="fas fa-times"></i>
+          <button mat-icon-button color="warn" (click)="deselect()">
+            <mat-icon>close</mat-icon>
           </button>
         </div>
         
-        <div class="properties-body row gx-3">
+        <div class="row gx-4 p-4 mx-0 overflow-auto text-light" style="max-height: 40vh; background-color: #1e1e1e;">
           <!-- Common Properties -->
-          <div class="col-12 mb-3">
-            <small class="text-info d-block mb-1">Clases aplicadas:</small>
-            <div class="d-flex flex-wrap gap-1">
+          <div class="col-12 mb-4 drop-shadow">
+            <small class="text-info d-block mb-2 fw-medium">Clases de Bootstrap Aplicadas en tiempo real:</small>
+            <div class="d-flex flex-wrap gap-2">
               @for (cls of appliedClasses(); track $index) {
-                <code class="badge bg-dark">{{ cls }}</code>
+                <span class="badge bg-primary fs-6">{{ cls }}</span>
               }
             </div>
           </div>
           
           @if (selectedElement()?.type === 'row') {
             <!-- ROW PROPERTIES -->
-            <div class="col-md-3 mb-3">
-              <label class="form-label">Height (h-*)</label>
-              <select class="form-select form-select-sm" [ngModel]="selectedRow()?.height || 'auto'" (ngModelChange)="updateRowProp('height', $event)">
-                <option value="auto">Auto</option>
-                <option value="25">25%</option>
-                <option value="50">50%</option>
-                <option value="75">75%</option>
-                <option value="100">100%</option>
-              </select>
+            <div class="col-md-4 mb-3">
+              <mat-form-field appearance="outline" class="w-100" color="accent">
+                <mat-label class="text-light">Height (h-*)</mat-label>
+                <mat-select [ngModel]="selectedRow()?.height || 'auto'" (ngModelChange)="updateRowProp('height', $event)">
+                  <mat-option value="auto">Auto</mat-option>
+                  <mat-option value="25">25%</mat-option>
+                  <mat-option value="50">50%</mat-option>
+                  <mat-option value="75">75%</mat-option>
+                  <mat-option value="100">100%</mat-option>
+                </mat-select>
+              </mat-form-field>
             </div>
             
-            <div class="col-md-3 mb-3">
-              <label class="form-label">Min Height (px, vh)</label>
-              <input type="text" class="form-control form-control-sm" placeholder="ej. 200px"
-                     [ngModel]="selectedRow()?.customHeight || ''"
-                     (ngModelChange)="updateRowProp('customHeight', $event)">
+            <div class="col-md-4 mb-3">
+              <mat-form-field appearance="outline" class="w-100" color="accent">
+                <mat-label class="text-light">Display (d-*)</mat-label>
+                <mat-select [ngModel]="selectedRow()?.display || ''" (ngModelChange)="updateRowProp('display', $event)">
+                  <mat-option value="">Default (flex)</mat-option>
+                  <mat-option value="flex">Flex</mat-option>
+                  <mat-option value="block">Block</mat-option>
+                  <mat-option value="none">None</mat-option>
+                </mat-select>
+              </mat-form-field>
             </div>
             
-            <div class="col-md-3 mb-3">
-              <label class="form-label">Display (d-*)</label>
-              <select class="form-select form-select-sm" [ngModel]="selectedRow()?.display || ''" (ngModelChange)="updateRowProp('display', $event)">
-                <option value="">Default</option>
-                <option value="flex">Flex</option>
-                <option value="block">Block</option>
-                <option value="none">None</option>
-              </select>
+            <div class="col-md-4 mb-3">
+              <mat-form-field appearance="outline" class="w-100" color="accent">
+                <mat-label class="text-light">Align Items</mat-label>
+                <mat-select [ngModel]="selectedRow()?.alignItems || ''" (ngModelChange)="updateRowProp('alignItems', $event)">
+                  <mat-option value="">Default</mat-option>
+                  <mat-option value="start">Start</mat-option>
+                  <mat-option value="center">Center</mat-option>
+                  <mat-option value="end">End</mat-option>
+                  <mat-option value="baseline">Baseline</mat-option>
+                  <mat-option value="stretch">Stretch</mat-option>
+                </mat-select>
+              </mat-form-field>
             </div>
             
-            <div class="col-md-3 mb-3">
-              <label class="form-label">Align Items</label>
-              <select class="form-select form-select-sm" [ngModel]="selectedRow()?.alignItems || ''" (ngModelChange)="updateRowProp('alignItems', $event)">
-                <option value="">Default</option>
-                <option value="start">Start</option>
-                <option value="center">Center</option>
-                <option value="end">End</option>
-                <option value="baseline">Baseline</option>
-                <option value="stretch">Stretch</option>
-              </select>
-            </div>
-            
-            <div class="col-md-3 mb-3">
-              <label class="form-label">Justify Content</label>
-              <select class="form-select form-select-sm" [ngModel]="selectedRow()?.justifyContent || ''" (ngModelChange)="updateRowProp('justifyContent', $event)">
-                <option value="">Default</option>
-                <option value="start">Start</option>
-                <option value="center">Center</option>
-                <option value="end">End</option>
-                <option value="between">Between</option>
-                <option value="around">Around</option>
-                <option value="evenly">Evenly</option>
-              </select>
-            </div>
+
           }
           
           @if (selectedElement()?.type === 'column') {
             <!-- COLUMN PROPERTIES -->
-            <div class="col-12 mb-2">
-              <h6 class="text-white mb-2 pb-1 border-bottom border-secondary">Tamaños Responsivos (1-12)</h6>
+            <div class="col-12 mb-3">
+              <h5 class="text-info fw-bold mb-3 pb-2 border-bottom border-secondary">Tamaños Responsivos (1-12)</h5>
+            </div>
+            <div class="col-md-2 mb-3">
+              <mat-form-field appearance="outline" class="w-100" color="accent">
+                <mat-label class="text-light">Móvil (xs)</mat-label>
+                <input matInput type="number" min="1" max="12" [ngModel]="selectedColumn()?.sizes?.xs" (ngModelChange)="updateColSize('xs', $event)">
+              </mat-form-field>
+            </div>
+            <div class="col-md-2 mb-3">
+              <mat-form-field appearance="outline" class="w-100" color="accent">
+                <mat-label class="text-light">Tablet (sm)</mat-label>
+                <input matInput type="number" min="1" max="12" [ngModel]="selectedColumn()?.sizes?.sm" (ngModelChange)="updateColSize('sm', $event)">
+              </mat-form-field>
             </div>
             <div class="col-md-3 mb-3">
-              <label class="form-label">Móvil (col-xs)</label>
-              <input type="number" class="form-control form-control-sm" min="1" max="12"
-                     [ngModel]="selectedColumn()?.sizes?.xs" 
-                     (ngModelChange)="updateColSize('xs', $event)">
+              <mat-form-field appearance="outline" class="w-100" color="accent">
+                <mat-label class="text-light">Desktop (md)</mat-label>
+                <input matInput type="number" min="1" max="12" [ngModel]="selectedColumn()?.sizes?.md" (ngModelChange)="updateColSize('md', $event)">
+              </mat-form-field>
             </div>
             <div class="col-md-3 mb-3">
-              <label class="form-label">Tablet (col-sm)</label>
-              <input type="number" class="form-control form-control-sm" min="1" max="12"
-                     [ngModel]="selectedColumn()?.sizes?.sm" 
-                     (ngModelChange)="updateColSize('sm', $event)">
+              <mat-form-field appearance="outline" class="w-100" color="accent">
+                <mat-label class="text-light">L. Desktop (lg)</mat-label>
+                <input matInput type="number" min="1" max="12" [ngModel]="selectedColumn()?.sizes?.lg" (ngModelChange)="updateColSize('lg', $event)">
+              </mat-form-field>
             </div>
-            <div class="col-md-3 mb-3">
-              <label class="form-label">Desktop (col-md)</label>
-              <input type="number" class="form-control form-control-sm" min="1" max="12"
-                     [ngModel]="selectedColumn()?.sizes?.md" 
-                     (ngModelChange)="updateColSize('md', $event)">
-            </div>
-            <div class="col-md-3 mb-3">
-              <label class="form-label">L. Desktop (col-lg)</label>
-              <input type="number" class="form-control form-control-sm" min="1" max="12"
-                     [ngModel]="selectedColumn()?.sizes?.lg" 
-                     (ngModelChange)="updateColSize('lg', $event)">
-            </div>
-            <div class="col-md-3 mb-3">
-              <label class="form-label">Monitor (col-xl)</label>
-              <input type="number" class="form-control form-control-sm" min="1" max="12"
-                     [ngModel]="selectedColumn()?.sizes?.xl" 
-                     (ngModelChange)="updateColSize('xl', $event)">
+            <div class="col-md-2 mb-3">
+              <mat-form-field appearance="outline" class="w-100" color="accent">
+                <mat-label class="text-light">Monitor (xl)</mat-label>
+                <input matInput type="number" min="1" max="12" [ngModel]="selectedColumn()?.sizes?.xl" (ngModelChange)="updateColSize('xl', $event)">
+              </mat-form-field>
             </div>
             
-            <div class="col-12 mb-2">
-              <h6 class="text-white mb-2 pb-1 border-bottom border-secondary">Otras clases</h6>
+            <div class="col-12 mt-2 mb-3">
+              <h5 class="text-info fw-bold mb-3 pb-2 border-bottom border-secondary">Otras configuraciones</h5>
             </div>
             <div class="col-md-4 mb-3">
-              <label class="form-label">Height (h-*)</label>
-              <select class="form-select form-select-sm" [ngModel]="selectedColumn()?.height || 'auto'" (ngModelChange)="updateColProp('height', $event)">
-                <option value="auto">Auto</option>
-                <option value="25">25%</option>
-                <option value="50">50%</option>
-                <option value="75">75%</option>
-                <option value="100">100%</option>
-              </select>
+              <mat-form-field appearance="outline" class="w-100" color="accent">
+                <mat-label class="text-light">Height (h-*)</mat-label>
+                <mat-select [ngModel]="selectedColumn()?.height || 'auto'" (ngModelChange)="updateColProp('height', $event)">
+                  <mat-option value="auto">Auto</mat-option>
+                  <mat-option value="25">25%</mat-option>
+                  <mat-option value="50">50%</mat-option>
+                  <mat-option value="75">75%</mat-option>
+                  <mat-option value="100">100%</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            
+
+            
+            <div class="col-md-4 mb-3">
+              <mat-form-field appearance="outline" class="w-100" color="accent">
+                <mat-label class="text-light">Display (d-*)</mat-label>
+                <mat-select [ngModel]="selectedColumn()?.display || ''" (ngModelChange)="updateColProp('display', $event)">
+                  <mat-option value="">Default</mat-option>
+                  <mat-option value="flex">Flex</mat-option>
+                  <mat-option value="block">Block</mat-option>
+                  <mat-option value="none">None</mat-option>
+                  <mat-option value="inline-block">Inline Block</mat-option>
+                </mat-select>
+              </mat-form-field>
             </div>
             
             <div class="col-md-4 mb-3">
-              <label class="form-label">Min Height (px, vh)</label>
-              <input type="text" class="form-control form-control-sm" placeholder="ej. 200px"
-                     [ngModel]="selectedColumn()?.customHeight || ''"
-                     (ngModelChange)="updateColProp('customHeight', $event)">
-            </div>
-            
-            <div class="col-md-4 mb-3">
-              <label class="form-label">Display (d-*)</label>
-              <select class="form-select form-select-sm" [ngModel]="selectedColumn()?.display || ''" (ngModelChange)="updateColProp('display', $event)">
-                <option value="">Default</option>
-                <option value="flex">Flex</option>
-                <option value="block">Block</option>
-                <option value="none">None</option>
-                <option value="inline-block">Inline Block</option>
-              </select>
-            </div>
-            
-            <div class="col-md-4 mb-3">
-              <label class="form-label">Align Self</label>
-              <select class="form-select form-select-sm" [ngModel]="selectedColumn()?.alignSelf || ''" (ngModelChange)="updateColProp('alignSelf', $event)">
-                <option value="">Default</option>
-                <option value="auto">Auto</option>
-                <option value="start">Start</option>
-                <option value="center">Center</option>
-                <option value="end">End</option>
-                <option value="stretch">Stretch</option>
-              </select>
+              <mat-form-field appearance="outline" class="w-100" color="accent">
+                <mat-label class="text-light">Align Self</mat-label>
+                <mat-select [ngModel]="selectedColumn()?.alignSelf || ''" (ngModelChange)="updateColProp('alignSelf', $event)">
+                  <mat-option value="">Default</mat-option>
+                  <mat-option value="auto">Auto</mat-option>
+                  <mat-option value="start">Start</mat-option>
+                  <mat-option value="center">Center</mat-option>
+                  <mat-option value="end">End</mat-option>
+                  <mat-option value="stretch">Stretch</mat-option>
+                </mat-select>
+              </mat-form-field>
             </div>
           }
         </div>
       </div>
     }
-  `,
-  styles: [`
-    .layout-area {
-      background: #fff;
-      min-height: 500px;
-      border-radius: 8px;
-      padding: 20px;
-      color: #333;
-      overflow-x: hidden;
-    }
-    
-    .empty-state {
-      text-align: center;
-      color: #999;
-      padding: 100px 20px;
-    }
-    
-    .row-container {
-      background: rgba(255, 193, 7, 0.05);
-      border: 2px dashed #ffc107;
-      border-radius: 8px;
-      padding: 25px 15px 15px;
-      margin-bottom: 20px;
-      position: relative;
-    }
-    
-    .row-label {
-      position: absolute;
-      top: -12px;
-      left: 10px;
-      background: #ffc107;
-      color: #000;
-      padding: 4px 12px;
-      font-size: 12px;
-      border-radius: 4px;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-      z-index: 10;
-    }
-    
-    .row-label:hover {
-      background: #ffca2c;
-    }
-    
-    .drag-handle {
-      cursor: grab;
-      color: rgba(0,0,0,0.5);
-    }
-    
-    .drag-handle:active {
-      cursor: grabbing;
-    }
-    
-    .column {
-      border: 2px dashed #0d6efd;
-      background: rgba(13, 110, 253, 0.05);
-      padding: 15px;
-      min-height: 100px;
-      border-radius: 4px;
-      transition: all 0.2s;
-      cursor: pointer;
-      margin-bottom: 10px;
-    }
-    
-    .column:hover {
-      border-color: #0b5ed7;
-      background: rgba(13, 110, 253, 0.1);
-    }
-    
-    .column.selected {
-      border-color: #198754;
-      background: rgba(25, 135, 84, 0.1);
-      box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.2);
-    }
-    
-    .column-header {
-      background: #0d6efd;
-      color: white;
-      padding: 5px 10px;
-      font-size: 12px;
-      border-radius: 4px 4px 0 0;
-      margin: -15px -15px 10px -15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .column-content {
-      min-height: 40px;
-      background: rgba(0, 0, 0, 0.05);
-      border-radius: 4px;
-      padding: 10px;
-      text-align: center;
-      color: #666;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .btn-delete {
-      background: #dc3545;
-      border: none;
-      color: white;
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .btn-delete:hover {
-      background: #c82333;
-    }
-    
-    .btn-delete-sm {
-      background: transparent;
-      border: none;
-      color: #000;
-      width: 20px;
-      height: 20px;
-      cursor: pointer;
-      font-size: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .btn-delete-sm:hover {
-      color: #dc3545;
-    }
-    
-    /* CDK Drag & Drop styles */
-    .cdk-drag-preview {
-      box-sizing: border-box;
-      border-radius: 4px;
-      box-shadow: 0 5px 15px -3px rgba(0, 0, 0, 0.2),
-                  0 8px 10px -5px rgba(0, 0, 0, 0.14);
-      opacity: 0.9;
-    }
-
-    .cdk-drag-placeholder {
-      opacity: 0.3;
-    }
-
-    .cdk-drag-animating {
-      transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-    }
-    
-    .rows-list.cdk-drop-list-dragging .row-container:not(.cdk-drag-placeholder) {
-      transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-    }
-    
-    .custom-row.cdk-drop-list-dragging > div:not(.cdk-drag-placeholder) {
-      transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-    }
-    
-    /* Drawer */
-    .properties-drawer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: #1e1e1e;
-      border-top: 3px solid #0d6efd;
-      z-index: 9999; 
-      transform: translateY(100%);
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
-    }
-    
-    @media (min-width: 768px) {
-      .properties-drawer {
-        left: 300px; /* offset sidebar exact width */
-        width: calc(100vw - 300px);
-      }
-    }
-    
-    .properties-drawer.open {
-      transform: translateY(0);
-    }
-    
-    .properties-header {
-      padding: 12px 20px;
-      background: #252525;
-      border-bottom: 1px solid #333;
-      color: #fff;
-    }
-    
-    .properties-body {
-      padding: 20px;
-      color: #eee;
-      max-height: 40vh;
-      overflow-y: auto;
-    }
-    
-    .btn-close-drawer {
-      background: transparent;
-      border: none;
-      color: #aaa;
-      cursor: pointer;
-      font-size: 16px;
-      padding: 4px;
-    }
-    
-    .btn-close-drawer:hover {
-      color: #fff;
-    }
-    
-    .form-label {
-      font-size: 12px;
-      color: #aaa;
-      margin-bottom: 4px;
-    }
-    
-    .form-select, .form-control {
-      background-color: #333;
-      color: #fff;
-      border-color: #444;
-    }
-    
-    .form-select:focus, .form-control:focus {
-      background-color: #444;
-      color: #fff;
-      border-color: #0d6efd;
-      box-shadow: none;
-    }
-  `]
+  `
 })
 export class LayoutAreaComponent {
   readonly layoutService = inject(LayoutService);
@@ -651,4 +422,4 @@ export class LayoutAreaComponent {
       event.currentIndex
     );
   }
-  }
+}

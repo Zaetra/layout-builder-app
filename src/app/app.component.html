@@ -12,31 +12,25 @@
       <span class="ms-2">Layout Builder</span>
     </mat-toolbar>
 
-    <div class="main-content">
-      <ul class="nav nav-tabs mb-4">
-        <li class="nav-item">
-          <button 
-            class="nav-link" 
-            [class.active]="currentView() === 'design'"
-            (click)="switchView('design')">
-            <i class="fas fa-palette me-2"></i>Diseño
-          </button>
-        </li>
-        <li class="nav-item">
-          <button 
-            class="nav-link" 
-            [class.active]="currentView() === 'code'"
-            (click)="switchView('code')">
-            <i class="fas fa-code me-2"></i>Código
-          </button>
-        </li>
-      </ul>
-      
-      @if (currentView() === 'design') {
-        <app-layout-area />
-      } @else {
-        <app-code-preview />
-      }
+    <div class="p-3 p-md-4 vh-100">
+      <mat-tab-group animationDuration="0ms">
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon class="me-2 text-primary">palette</mat-icon> Diseño
+          </ng-template>
+          <div class="pt-4">
+            <app-layout-area />
+          </div>
+        </mat-tab>
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon class="me-2 text-warning">code</mat-icon> Código
+          </ng-template>
+          <div class="pt-4">
+            <app-code-preview />
+          </div>
+        </mat-tab>
+      </mat-tab-group>
     </div>
   </mat-sidenav-content>
 
