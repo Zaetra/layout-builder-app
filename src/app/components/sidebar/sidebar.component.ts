@@ -70,6 +70,7 @@ import { LayoutService } from '../../services/layout.service';
       background: #16213e;
       padding: 20px;
       overflow-y: auto;
+      width: 300px;
     }
     
     .presets-container {

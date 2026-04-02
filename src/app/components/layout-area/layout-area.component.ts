@@ -43,6 +43,7 @@ interface SelectedElement {
               
               <div class="row custom-row flex-wrap"
                    [class]="getRowClasses(row)"
+                   [style.min-height]="row.customHeight"
                    cdkDropList
                    [id]="'row-list-' + row.id"
                    [cdkDropListConnectedTo]="getConnectedListIds()"
@@ -53,7 +54,8 @@ interface SelectedElement {
                 @for (col of row.columns; track col.id) {
                   <div [class]="getColClasses(col)" cdkDrag>
                     <div class="column" 
-                         [class.selected]="isSelectedColumn(row.id, col.id)" 
+                         [class.selected]="isSelectedColumn(row.id, col.id)"
+                         [style.min-height]="col.customHeight"
                          (click)="selectColumn(row.id, col.id); $event.stopPropagation()">
                          
                       <div class="column-header">
@@ -129,6 +131,13 @@ interface SelectedElement {
                 <option value="75">75%</option>
                 <option value="100">100%</option>
               </select>
+            </div>
+            
+            <div class="col-md-3 mb-3">
+              <label class="form-label">Min Height (px, vh)</label>
+              <input type="text" class="form-control form-control-sm" placeholder="ej. 200px"
+                     [ngModel]="selectedRow()?.customHeight || ''"
+                     (ngModelChange)="updateRowProp('customHeight', $event)">
             </div>
             
             <div class="col-md-3 mb-3">
@@ -215,6 +224,13 @@ interface SelectedElement {
                 <option value="75">75%</option>
                 <option value="100">100%</option>
               </select>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Min Height (px, vh)</label>
+              <input type="text" class="form-control form-control-sm" placeholder="ej. 200px"
+                     [ngModel]="selectedColumn()?.customHeight || ''"
+                     (ngModelChange)="updateColProp('customHeight', $event)">
             </div>
             
             <div class="col-md-4 mb-3">
@@ -412,7 +428,7 @@ interface SelectedElement {
       right: 0;
       background: #1e1e1e;
       border-top: 3px solid #0d6efd;
-      z-index: 1000;
+      z-index: 9999; 
       transform: translateY(100%);
       transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
@@ -420,7 +436,8 @@ interface SelectedElement {
     
     @media (min-width: 768px) {
       .properties-drawer {
-        left: 280px; /* offset sidebar width */
+        left: 300px; /* offset sidebar exact width */
+        width: calc(100vw - 300px);
       }
     }
     
@@ -634,4 +651,4 @@ export class LayoutAreaComponent {
       event.currentIndex
     );
   }
-}
+  }

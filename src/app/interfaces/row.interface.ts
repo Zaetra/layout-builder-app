@@ -17,6 +17,7 @@ export interface Column {
   sizes: ColumnSizes;
   content: string;
   height?: ColumnHeight;
+  customHeight?: string;
   display?: Display;
   alignSelf?: AlignSelf;
 }
@@ -25,6 +26,7 @@ export interface Row {
   id: number;
   columns: Column[];
   height?: ColumnHeight;
+  customHeight?: string;
   display?: Display;
   alignItems?: AlignItems;
   justifyContent?: JustifyContent;

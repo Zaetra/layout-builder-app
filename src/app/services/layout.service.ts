@@ -191,7 +191,10 @@ export class LayoutService {
       if (row.display) rowClasses.push(`d-${row.display}`);
       
       const rowClassStr = rowClasses.join(' ');
-      html += `  <div class="${rowClassStr}">\n`;
+      let rowStyle = '';
+      if (row.customHeight) rowStyle = ` style="min-height: ${row.customHeight};"`;
+      
+      html += `  <div class="${rowClassStr}"${rowStyle}>\n`;
       row.columns.forEach(col => {
         const colClasses = [];
         if (col.sizes.xs) colClasses.push(`col-${col.sizes.xs}`);
@@ -205,8 +208,11 @@ export class LayoutService {
         if (col.display) colClasses.push(`d-${col.display}`);
         if (col.alignSelf) colClasses.push(`align-self-${col.alignSelf}`);
 
+        let colStyle = '';
+        if (col.customHeight) colStyle = ` style="min-height: ${col.customHeight};"`;
+
         const colClassStr = colClasses.join(' ');
-        html += `    <div class="${colClassStr}">\n`;
+        html += `    <div class="${colClassStr}"${colStyle}>\n`;
         html += '      <div class="content-box">Contenido</div>\n';
         html += '    </div>\n';
       });
