@@ -9,7 +9,7 @@ import { LayoutService } from '../../services/layout.service';
   standalone: true,
   imports: [CommonModule, MatIconModule, MatButtonModule],
   template: `
-    <div class="h-100 d-flex flex-column text-light p-4 overflow-auto border-end border-secondary" style="width: 300px; background-color: #16213e;">
+    <div class="h-100 d-flex flex-column text-light p-4 overflow-auto border-end border-secondary">
       <div class="d-flex justify-content-between align-items-center mb-4 d-md-none">
         <h5 class="mb-0 d-flex align-items-center">
           <mat-icon class="me-2 text-primary">dashboard</mat-icon> Layout Builder
@@ -26,20 +26,15 @@ import { LayoutService } from '../../services/layout.service';
       </div>
       
       <h6 class="text-secondary mb-3 text-uppercase small fw-bold">Preset de Filas</h6>
-      <div class="flex-grow-1 overflow-auto" style="max-height: 400px;">
+      <div class="flex-grow-1 overflow-auto">
         @for (preset of layoutService.presets; track preset.name; let i = $index) {
-          <div class="card bg-secondary bg-opacity-25 border-secondary mb-3" style="cursor: pointer;" (click)="applyPreset(preset)">
+          <div class="card bg-secondary cursor-pointer bg-opacity-25 border-secondary mb-3" (click)="applyPreset(preset)">
             <div class="card-body p-3">
               <div class="d-flex justify-content-between align-items-center mb-2">
                 <span class="text-light fw-medium">{{ preset.name }}</span>
-                <button mat-icon-button color="primary" class="align-self-center" style="transform: scale(0.8);" (click)="applyPreset(preset); $event.stopPropagation()">
+                <button mat-icon-button color="primary" class="align-self-center" (click)="applyPreset(preset); $event.stopPropagation()">
                   <mat-icon>add</mat-icon>
                 </button>
-              </div>
-              <div class="d-grid gap-1" style="grid-template-columns: repeat(12, 1fr);">
-                @for (size of preset.cols; track $index) {
-                  <div class="bg-primary rounded-1" [style.grid-column]="'span ' + size" style="height: 8px;"></div>
-                }
               </div>
             </div>
           </div>

@@ -45,19 +45,16 @@ interface SelectedElement {
           class="w-100">
           
           @for (row of layoutService.rows(); track row.id) {
-            <div class="bg-warning bg-opacity-10 border border-warning rounded p-4 pt-4 pb-3 mb-4 position-relative" style="border-style: dashed !important; border-width: 2px !important;" cdkDrag>
+            <div class="bg-warning bg-opacity-10 border border-warning rounded p-4 pt-4 pb-3 mb-4 position-relative" cdkDrag>
               
-              <div class="position-absolute top-0 start-0 translate-middle-y ms-3 badge bg-warning text-dark d-flex align-items-center shadow-sm z-3" style="cursor: pointer; font-size: 13px;" (click)="selectRow(row.id); $event.stopPropagation()">
-                <mat-icon class="me-1" style="font-size: 16px; width: 16px; height: 16px; cursor: grab;" cdkDragHandle>drag_indicator</mat-icon> 
+              <div class="position-absolute top-0 start-0 translate-middle-y ms-3 badge bg-warning text-dark d-flex align-items-center shadow-sm z-3" (click)="selectRow(row.id); $event.stopPropagation()">
+                <mat-icon class="me-1" cdkDragHandle>drag_indicator</mat-icon> 
                 Fila {{ $index + 1 }}
-                <button mat-icon-button class="ms-1" style="width: 24px; height: 24px; line-height: 24px; padding: 0;" (click)="removeRow(row.id); $event.stopPropagation()">
-                  <mat-icon style="font-size: 16px;">close</mat-icon>
-                </button>
+                <mat-icon (click)="removeRow(row.id); $event.stopPropagation()" class="ms-1">close</mat-icon>
               </div>
               
               <div class="row flex-wrap align-items-stretch"
                    [class]="getRowClasses(row)"
-                   [style.min-height]="row.customHeight"
                    cdkDropList
                    [id]="'row-list-' + row.id"
                    [cdkDropListConnectedTo]="getConnectedListIds()"
@@ -69,8 +66,6 @@ interface SelectedElement {
                   <div [class]="getColClasses(col)" class="mb-3" cdkDrag>
                     <div class="h-100 rounded p-3 position-relative border border-primary border-opacity-75 transition-all" 
                          [ngClass]="isSelectedColumn(row.id, col.id) ? 'bg-success bg-opacity-10 border-success shadow-sm' : 'bg-primary bg-opacity-10'"
-                         style="border-style: dashed !important; border-width: 2px !important; cursor: pointer; min-height: 100px;"
-                         [style.min-height]="col.customHeight"
                          (click)="selectColumn(row.id, col.id); $event.stopPropagation()">
                          
                       <div class="bg-primary text-white position-absolute top-0 start-0 end-0 d-flex justify-content-between align-items-center px-2 py-1 shadow-sm" style="border-radius: 2px 2px 0 0; font-size: 12px; margin-top: -2px; margin-left: -2px; margin-right: -2px;" [ngClass]="isSelectedColumn(row.id, col.id) ? 'bg-success' : 'bg-primary'">
@@ -107,7 +102,7 @@ interface SelectedElement {
     </div>
 
     @if (selectedElement()) {
-      <div class="position-sticky bottom-0 w-100 bg-dark text-white shadow-lg border-top border-primary border-3 rounded-top mt-5" (click)="$event.stopPropagation()" style="z-index: 1050;">
+      <div class="position-fixed bottom-0 end-0 bg-dark text-white shadow-lg border-top border-primary border-3 rounded-top" (click)="$event.stopPropagation()">
         
         <div class="d-flex justify-content-between align-items-center bg-secondary bg-opacity-25 py-2 px-4 shadow-sm">
           <div class="d-flex align-items-center">
@@ -122,7 +117,7 @@ interface SelectedElement {
           </button>
         </div>
         
-        <div class="row gx-4 p-4 mx-0 overflow-auto text-light" style="max-height: 40vh; background-color: #1e1e1e;">
+        <div class="row gx-4 p-4 mx-0 overflow-auto text-light">
           <!-- Common Properties -->
           <div class="col-12 mb-4 drop-shadow">
             <small class="text-info d-block mb-2 fw-medium">Clases de Bootstrap Aplicadas en tiempo real:</small>
