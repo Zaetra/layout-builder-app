@@ -18,8 +18,8 @@ import { LayoutService } from '../../services/layout.service';
           <mat-icon class="me-2">content_copy</mat-icon> Copiar
         </button>
       </div>
-      <div class="bg-dark rounded p-4 text-light overflow-auto" style="max-height: 400px;">
-        <pre class="m-0" style="font-size: 13px;"><code class="text-light" style="font-family: 'Consolas', 'Monaco', monospace; white-space: pre;">{{ layoutService.generatedCode() }}</code></pre>
+      <div class="bg-dark rounded p-4 text-light overflow-auto mh-100">
+        <pre class="m-0 small"><code class="text-light font-monospace">{{ layoutService.generatedCode() }}</code></pre>
       </div>
     </div>
   `

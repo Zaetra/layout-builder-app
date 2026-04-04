@@ -33,7 +33,7 @@ interface SelectedElement {
     <div class="h-100 bg-white rounded p-4 text-dark overflow-hidden mb-5 pb-5" (click)="deselect()">
       @if (layoutService.rows().length === 0) {
         <div class="text-center text-muted py-5 px-3">
-          <mat-icon style="font-size: 48px; width: 48px; height: 48px; opacity: 0.5;" class="mb-3">ads_click</mat-icon>
+          <mat-icon class="mb-3 opacity-50 display-1 h-auto w-auto">ads_click</mat-icon>
           <p class="fs-5">Agrega filas y columnas para comenzar tu layout</p>
           <small>Usa los presets de la izquierda o uno personalizado</small>
         </div>
@@ -68,17 +68,17 @@ interface SelectedElement {
                          [ngClass]="isSelectedColumn(row.id, col.id) ? 'bg-success bg-opacity-10 border-success shadow-sm' : 'bg-primary bg-opacity-10'"
                          (click)="selectColumn(row.id, col.id); $event.stopPropagation()">
                          
-                      <div class="bg-primary text-white position-absolute top-0 start-0 end-0 d-flex justify-content-between align-items-center px-2 py-1 shadow-sm" style="border-radius: 2px 2px 0 0; font-size: 12px; margin-top: -2px; margin-left: -2px; margin-right: -2px;" [ngClass]="isSelectedColumn(row.id, col.id) ? 'bg-success' : 'bg-primary'">
+                      <div class="bg-primary text-white position-absolute top-0 start-0 end-0 d-flex justify-content-between align-items-center px-2 py-1 shadow-sm rounded-top small m-0" [ngClass]="isSelectedColumn(row.id, col.id) ? 'bg-success' : 'bg-primary'">
                         <div class="d-flex align-items-center gap-1">
-                          <mat-icon style="font-size: 14px; width: 14px; height: 14px; cursor: grab;" cdkDragHandle>drag_indicator</mat-icon>
+                          <mat-icon class="small pointer-move" cdkDragHandle>drag_indicator</mat-icon>
                           <span>Col (md-{{ col.sizes.md || 'auto' }})</span>
                         </div>
-                        <button mat-icon-button class="text-white" style="width: 20px; height: 20px; line-height: 20px; padding: 0;" (click)="removeColumn(row.id, col.id); $event.stopPropagation()">
-                          <mat-icon style="font-size: 14px;">close</mat-icon>
+                        <button mat-icon-button class="text-white p-0 small" (click)="removeColumn(row.id, col.id); $event.stopPropagation()">
+                          <mat-icon class="small">close</mat-icon>
                         </button>
                       </div>
                       
-                      <div class="h-100 mt-4 bg-dark bg-opacity-10 rounded d-flex align-items-center justify-content-center text-muted" style="min-height: 40px;">
+                      <div class="h-100 mt-4 bg-dark bg-opacity-10 rounded d-flex align-items-center justify-content-center text-muted px-2 py-3 overflow-hidden">
                         Contenido
                       </div>
                     </div>
@@ -102,7 +102,11 @@ interface SelectedElement {
     </div>
 
     @if (selectedElement()) {
-      <div class="position-fixed bottom-0 end-0 bg-dark text-white shadow-lg border-top border-primary border-3 rounded-top" (click)="$event.stopPropagation()">
+      <div class="fixed-bottom p-0" (click)="$event.stopPropagation()">
+        <div class="container-fluid p-0">
+          <div class="row m-0">
+            <div class="col-md-3 d-none d-md-block"></div> <!-- Sidebar gap to avoid overlapping the 25% sidebar -->
+            <div class="col-12 col-md-9 p-0 bg-dark text-white border-top border-primary border-3 rounded-top shadow-lg overflow-hidden">
         
         <div class="d-flex justify-content-between align-items-center bg-secondary bg-opacity-25 py-2 px-4 shadow-sm">
           <div class="d-flex align-items-center">
@@ -255,6 +259,9 @@ interface SelectedElement {
           }
         </div>
       </div>
+    </div>
+  </div>
+</div>
     }
   `
 })
